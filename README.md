@@ -1,35 +1,81 @@
-# Orchestration Scripts
+# Projeto de Orquestração com Prefect e FastAPI
 
-This directory contains the core scripts for orchestrating data scraping and posting workflows using Prefect.
+Este projeto demonstra um fluxo de orquestração de dados utilizando Prefect para extrair dados de uma API (Reddit) e uma API FastAPI para armazenar e expor os dados.
 
-## Scripts
+## Como Executar
 
-### `api_tool.py`
+Para executar o projeto, você precisará ter o Docker e o Docker Compose instalados.
 
-This script provides tools for interacting with the Reddit API and processing the response data.
+1.  **Clone o repositório:**
 
-- **`ApiCaller` class:** Fetches data from a specified subreddit.
-- **`ResponseNavigator` class:** Extracts and organizes specific data points from the API response, such as URLs, authors, titles, and votes.
+    ```bash
+    git clone <url-do-repositorio>
+    cd <nome-do-repositorio>
+    ```
 
-### `orchestration_tools.py`
+2.  **Execute o Docker Compose:**
 
-This script defines the Prefect tasks and flows for the data scraping and posting processes.
+    ```bash
+    docker-compose up -d
+    ```
 
-- **Tasks:**
-    - `fetch_data`: Retrieves data from a subreddit using `ApiCaller`.
-    - `fetch_urls`, `fetch_authors`, `fetch_titles`, `fetch_votes`: Extract specific information from the fetched data.
-    - `summarize`: Aggregates the extracted data into a structured format.
-    - `items_to_post`: Compares the scraped items with stored data to determine which items are new.
-    - `post_items`: Posts the new items to a specified endpoint.
+    Isso irá construir e iniciar os dois serviços definidos no `docker-compose.yaml`: `backend` e `orchestration`.
 
-- **Flows:**
-    - `scrape_flow`: Orchestrates the data fetching and processing tasks.
-    - `post_flow`: Orchestrates the tasks for posting new data.
+## Verificando os Serviços
 
-### `orchestration.py`
+### Orquestração (Prefect)
 
-This is the main script for deploying and scheduling the Prefect flows.
+A interface do usuário do Prefect estará disponível em [http://localhost:4200](http://localhost:4200).
 
-- It serves the `scrape_flow` and `post_flow` with a CRON schedule to run every two hours.
-- The `scrape_flow` is named `scraper-flow`.
-- The `post_flow` is named `post-flow` and receives the output of the scrape flow.
+Nesta interface, você poderá visualizar os fluxos (`scrape_flow` e `post_flow`), seus status e logs de execução. Os fluxos são configurados para rodar a cada duas horas.
+
+### API (FastAPI)
+
+A API FastAPI estará disponível em [http://localhost:9001](http://localhost:9001).
+
+A API possui os seguintes endpoints:
+
+*   **`GET /get`**: Retorna os dados armazenados em formato JSON.
+*   **`POST /post`**: Recebe novos dados do fluxo de orquestração e os armazena.
+
+---
+
+# Orchestration Project with Prefect and FastAPI
+
+This project demonstrates a data orchestration workflow using Prefect to extract data from an API (Reddit) and a FastAPI to store and expose the data.
+
+## How to Run
+
+To run the project, you will need to have Docker and Docker Compose installed.
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone <repository-url>
+    cd <repository-name>
+    ```
+
+2.  **Run Docker Compose:**
+
+    ```bash
+    docker-compose up -d
+    ```
+
+    This will build and start the two services defined in `docker-compose.yaml`: `backend` and `orchestration`.
+
+## Checking the Services
+
+### Orchestration (Prefect)
+
+The Prefect UI will be available at [http://localhost:4200](http://localhost:4200).
+
+In this interface, you can view the flows (`scrape_flow` and `post_flow`), their status, and execution logs. The flows are configured to run every two hours.
+
+### API (FastAPI)
+
+The FastAPI will be available at [http://localhost:9001](http.localhost:9001).
+
+The API has the following endpoints:
+
+*   **`GET /get`**: Returns the stored data in JSON format.
+*   **`POST /post`**: Receives new data from the orchestration flow and stores it.

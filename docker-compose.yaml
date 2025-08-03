@@ -7,11 +7,11 @@ services:
     command: ['uv', 'run', './backend/rest.py']
 
   orchestration:
-    build: ./main/
+    build: ./main/    
     restart: always
     ports:
       - "4200:4200"
-    command: ['uv', 'run', './orchestrator/orchestation.py']
+    command: ['uv', 'run', './orchestrator/orchestration.py']
     depends_on: 
       - backend
   
