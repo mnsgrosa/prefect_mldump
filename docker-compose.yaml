@@ -1,0 +1,17 @@
+services:
+  backend:
+    build: ./main/
+    restart: always
+    ports:
+      - "9001:9001"
+    command: ['uv', 'run', './backend/rest.py']
+
+  orchestration:
+    build: ./main/
+    restart: always
+    ports:
+      - "4200:4200"
+    command: ['uv', 'run', './orchestrator/orchestation.py']
+    depends_on: 
+      - backend
+  
