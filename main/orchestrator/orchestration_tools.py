@@ -46,7 +46,7 @@ def scrape_flow():
 
 @task
 def items_to_post(sumarization):
-    stored = httpx.get('http://localhost:8000/get').json()
+    stored = httpx.get('http://localhost:9001/get').json()
     to_post = []
 
     for key in sumarization.keys():
@@ -58,7 +58,7 @@ def items_to_post(sumarization):
 @task
 def post_items(items_to_post):
     try:
-        httpx.post('http://localhost:8000/post', json = {'items': items_to_post})
+        httpx.post('http://localhost:9001/post', json = {'items': items_to_post})
         return Completed(message = 'New posts added')
     except execpt as e:
         return Failed(message = f'No new post was added due to: {e}')

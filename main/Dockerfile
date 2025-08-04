@@ -4,8 +4,6 @@ WORKDIR /app
 
 COPY . /app
 
-RUN chmod +x /app/*.sh
-
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
 
 ADD https://astral.sh/uv/install.sh /uv-installer.sh

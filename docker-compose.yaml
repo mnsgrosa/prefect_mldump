@@ -1,26 +1,70 @@
 services:
   backend:
     build: ./main/
-    restart: always
+    command: uv run ./backend/rest.py
     ports:
       - "9001:9001"
-    command: ['uv', 'run', './backend/rest.py']
+    networks:
+      - prefect-network
 
-  prefect-server:
-    build: ./main/
+  flow-server:
+    image: prefecthq/prefect:3.4.12.dev1-python3.12
     restart: always
+    command: prefect server start
     ports:
       - "4200:4200"
-    command: ["sh", "./start_prefect.sh"]
-    depends_on:
-      - backend
+    environment:
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_UI_API_URL=http://localhost:4200/api 
+    networks:
+      - prefect-network
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import socket; s=socket.socket(); s.connect((\"localhost\", 4200)); s.close()'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
-  orchestration:
-    build: ./main/    
+  work-pool-creator:
+    build: ./main/
+    command: uv run ./orchestrator/work_pool.py
+    volumes:
+      - ./main:/app
+    environment:
+      - PREFECT_API_URL=http://flow-server:4200/api
+    networks:
+      - prefect-network
+    depends_on:
+      flow-server:
+        condition: service_healthy
+
+  flow-scheduler:
+    build: ./main/
+    command: uv run ./orchestrator/orchestration.py
+    environment:
+      - PREFECT_API_URL=http://flow-server:4200/api
+    volumes:
+      - ./main:/app
+    depends_on:
+      work-pool-creator:
+        condition: service_completed_successfully
+    networks:
+      - prefect-network
+
+  flow-start:
+    build: ./main/
+    command: uv run prefect worker start --pool my-docker-pool
     restart: always
-    ports:
-      - "3600:3600"
-    command: ["sh", "./start_workers.sh"]
-    depends_on: 
-      - backend
-      - prefect-server  
+    environment:
+      - PREFECT_API_URL=http://flow-server:4200/api
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - prefect-network
+    depends_on:
+      flow-scheduler:
+        condition: service_completed_successfully
+      
+networks:
+  prefect-network:
+    driver: bridge

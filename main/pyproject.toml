@@ -9,7 +9,7 @@ dependencies = [
     "fastapi>=0.116.1",
     "httpx>=0.28.1",
     "pandas>=2.3.1",
-    "prefect>=3.4.11",
+    "prefect[docker]>=3.4.11",
     "psycopg2-binary>=2.9.10",
     "uvicorn>=0.35.0",
 ]

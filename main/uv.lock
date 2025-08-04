@@ -948,6 +948,25 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ea/e3/9d8af9231069f796cfd06083781b147f3a4bc8428520bcb88dfe28b702fd/prefect-3.4.11-py3-none-any.whl", hash = "sha256:332b3f2930100e168b5c0199ec6da57c38b8bac3ba7a33cb45515cb96c294fc5", size = 6081906, upload-time = "2025-07-31T20:53:44.58Z" },
 ]
 
+[package.optional-dependencies]
+docker = [
+    { name = "prefect-docker" },
+]
+
+[[package]]
+name = "prefect-docker"
+version = "0.6.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "docker" },
+    { name = "exceptiongroup" },
+    { name = "prefect" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f0/41/f763035762da3dcf641f6d89956e351d48f76bbf72392e4095a9181c1cc9/prefect_docker-0.6.6.tar.gz", hash = "sha256:fd9a927b36d4b86ccbfd810688b186be07a0b2c99afbae5864aaec89963fa078", size = 39079, upload-time = "2025-05-28T18:06:36.136Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/65/3e/d97e83cd1d0b5d9e40a5cc41838e2b79fc210ec7b533486c5461727cf513/prefect_docker-0.6.6-py3-none-any.whl", hash = "sha256:5b9ab447bfa563cf3304e66b32113727d40fd451144ea3a199e5b6406293eb0b", size = 27518, upload-time = "2025-05-28T18:06:34.773Z" },
+]
+
 [[package]]
 name = "prefect-mldump"
 version = "0.1.0"
@@ -957,7 +976,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
     { name = "pandas" },
-    { name = "prefect" },
+    { name = "prefect", extra = ["docker"] },
     { name = "psycopg2-binary" },
     { name = "uvicorn" },
 ]
@@ -968,7 +987,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.116.1" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "pandas", specifier = ">=2.3.1" },
-    { name = "prefect", specifier = ">=3.4.11" },
+    { name = "prefect", extras = ["docker"], specifier = ">=3.4.11" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "uvicorn", specifier = ">=0.35.0" },
 ]
