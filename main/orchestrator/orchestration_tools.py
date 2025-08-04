@@ -10,7 +10,7 @@ def fetch_data(subreddit: str = 'redditdev'):
 
 @task
 def fetch_urls(data: Dict[str, Any]) -> List[str]:
-    caller = ApiCaller(data = data)
+    caller = ResponseNavigator(data = data)
     return caller.scrape_urls()
 
 @task
@@ -41,11 +41,11 @@ def scrape_flow():
     titles = fetch_titles(data)
     votes = fetch_votes(data)
     to_sumarize = {'titles':titles, 'urls': urls, 'authors': authors, 'votes': votes}
-    sumarization = summarize(**data)
-    return sumarization
+    summarization = summarize(**to_sumarize)
+    return summarization
 
 @task
-def items_to_post(sumarization):
+def items_to_post(summarization):
     stored = httpx.get('http://localhost:9001/get').json()
     to_post = []
 
@@ -60,23 +60,15 @@ def post_items(items_to_post):
     try:
         httpx.post('http://localhost:9001/post', json = {'items': items_to_post})
         return Completed(message = 'New posts added')
-    except execpt as e:
+    except Exception as e:
         return Failed(message = f'No new post was added due to: {e}')
 
 @flow(log_prints = True)
 def post_flow(summarization):
     items_to_post = items_to_post(sumarization)
-    post_items(items_to_post)
+    return post_items(items_to_post)
 
-@task
-def save_csv(sumarization):
-    sumarization_temp = {'title': [], 'url': [], 'author': [], 'upvotes': [], 'downvotes': []}
-    for key in sumarization.keys():
-        sumarization_temp['title'].append(key)
-        sumarization_temp['url'].append(sumarization[key]['url'])
-        sumarization_temp['author'].append(sumarization[key]['author'])
-        sumarization_temp['upvotes'].append(sumarization[key]['votes']['upvotes'])
-        sumarization_temp['downvotes'].append(sumarization[key]['votes']['downvotes'])
-
-    df = pd.DataFrame(sumarization_temp)
-    df.to_csv('./sumarization.csv')
+@flow(log_prints = True)
+def full_flow():
+    summarization = scrape_flow()
+    return post_flow(summarization)

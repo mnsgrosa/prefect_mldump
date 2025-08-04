@@ -20,7 +20,6 @@ def post_data(data: Dict[str, Any]):
     try:
         transformed_data = {'title': [], 'url': [], 'author': [], 'upvotes': [], 'downvotes': []}
         for item in data.keys():
-
             transformed_data['title'].append(item)
             transformed_data['url'].append(data[item]['url'])
             transformed_data['author'].append(data[item]['author'])
